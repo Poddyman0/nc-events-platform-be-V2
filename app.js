@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const express = require('express');
+const cors = require('cors')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -10,6 +11,7 @@ const RateLimit = require("express-rate-limit");
 require('dotenv').config()
 
 const app = express();
+
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
@@ -25,6 +27,8 @@ const limiter = RateLimit({
   max: 60,
 });
 // Apply rate limiter to all requests
+app.use(cors());
+
 app.use(limiter);
 
 app.use(
