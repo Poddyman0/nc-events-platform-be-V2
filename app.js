@@ -28,7 +28,7 @@ const limiter = RateLimit({
 });
 // Apply rate limiter to all requests
 app.use(cors({
-  origin: "https://nc-events-platform-production.up.railway.app",
+  origin: true,
   headers: ["Content-Type"],
   credentials: true,
 }));
