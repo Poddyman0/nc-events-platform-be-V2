@@ -27,7 +27,11 @@ const limiter = RateLimit({
   max: 60,
 });
 // Apply rate limiter to all requests
-app.use(cors());
+app.use(cors({
+  origin: "https://slug-panel.onrender.com",
+  headers: ["Content-Type"],
+  credentials: true,
+}));
 
 app.use(limiter);
 
