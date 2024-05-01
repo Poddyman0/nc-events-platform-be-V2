@@ -11,7 +11,9 @@ const RateLimit = require("express-rate-limit");
 require('dotenv').config()
 
 const app = express();
-
+app.use(cors({
+  origin: "*",
+}));
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
@@ -27,11 +29,7 @@ const limiter = RateLimit({
   max: 60,
 });
 // Apply rate limiter to all requests
-app.use(cors({
-  origin: true,
-  headers: ["Content-Type"],
-  credentials: true,
-}));
+
 
 app.use(limiter);
 
