@@ -28,7 +28,7 @@ const limiter = RateLimit({
 });
 // Apply rate limiter to all requests
 app.use(cors({
-  origin: "https://slug-panel.onrender.com",
+  origin: "https://nc-events-platform-production.up.railway.app",
   headers: ["Content-Type"],
   credentials: true,
 }));
