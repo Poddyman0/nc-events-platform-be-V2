@@ -1,12 +1,12 @@
 const createError = require("http-errors");
 const express = require('express');
-const cors = require('cors')
+//const cors = require('cors')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const platformRouter = require('./routes/platform'); 
-const helmet = require("helmet");
+//const helmet = require("helmet");
 const RateLimit = require("express-rate-limit");
 require('dotenv').config()
 
@@ -34,15 +34,9 @@ const limiter = RateLimit({
 app.use(limiter);
 //added below
 
-app.use(cors())
-app.use(helmet());
-app.use((req, res, next) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
-  next();
-});
-// added above
 
-/*
+
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
@@ -51,7 +45,7 @@ app.use((req, res, next) => {
 
   next();
 })
-*/
+
 /*
 app.use(
   helmet.contentSecurityPolicy({
@@ -61,6 +55,7 @@ app.use(
   }),
 );
 */
+
 
 app.use(logger('dev'));
 app.use(express.json());
