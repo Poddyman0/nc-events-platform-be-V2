@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
 export let eventIDToView = ""
 
 function handleEventButtonClick(event) {
-        eventIDToView = `${event.target.value}`;
-        console.log("has event", eventIDToView);
+    eventIDToView = `${event.target.value}`;
+    console.log("has event", eventIDToView);
         window.location.href = "/event.html";
         return eventIDToView
 }
@@ -23,7 +23,6 @@ export let eventCallendar = [];
 
 
 function loadEvents () {
-    //console.log("event id in events", eventIDToView)
 
     const eventDisplay = document.querySelector('.card-container')
     fetchEvents ()
@@ -35,57 +34,33 @@ function loadEvents () {
                 return response.json();
             })
             .then(function(response) {
-                response.forEach(event => {
-                    /*
-                    let eventsResponse = {
-                        event_id: event.eventID,
-                        event_organiser: event.eventOrganiser,
-                        event_name: event.eventName,
-                        event_description: event.eventDescription,
-                        event_start_date: event.eventStartDate,
-                        event_start_time: event.eventStartTime,
-                        event_end_date: event.eventEndDate,
-                        event_end_time: event.eventEndTime,
-                        event_building_number: event.eventBuildingNumber,
-                        event_street_name: event.eventStreetName,
-                        event_city: event.eventCity,
-                        event_county: event.eventCounty,
-                        event_country: event.eventCountry,
-                        event_post_code: event.eventPostCode,
-                        event_pricing: event.eventPricing,
-                        event_ticket_price: event.eventTicketPrice,
-                        event_ticket_amount: event.eventTicketAmount,
-                        event_picture: event.eventPicture,
-                        event_atendees: event.eventAtendees,
-    
-                    }
-                    */
+                response.forEach(aEvent => {
 
-                    eventsArray.push(event)
+                    eventsArray.push(aEvent)
                     let aEventToDisplay = document.createElement('div')
                     aEventToDisplay.className = "card"
-                    aEventToDisplay.id = `event-card-${event._id}`
+                    aEventToDisplay.id = `event-card-${aEvent._id}`
                     aEventToDisplay.innerHTML = `
                         <div class="card-body">
                             <div class="card-title-icon-container">
-                                <h5 class="card-title">${event.eventName}</h5>
+                                <h5 class="card-title">${aEvent.eventName}</h5>
                             </div>
-                        <p class="card-text">Description: ${event.eventDescription}</p>
-                        <p class="card-text">Start Date: ${event.eventStartDate}</p>
-                        <p class="card-text">Start Time: ${event.eventStartTime}</p>
-                        <p class="card-text">End Date: ${event.eventEndDate}</p>
-                        <p class="card-text">End Time: ${event.eventEndTime}</p>
-                        <p class="card-text">Location: ${event.eventBuildingNumber}, ${event.eventStreetName}, ${event.eventCity}, ${event.eventCounty}, ${event.eventCountry}, ${event.eventPostCode}</p>
-                        <p class="card-text">Pricing: ${event.eventPricing}</p>
-                        <p class="card-text">Price: £${event.eventTicketPrice}</p>
-                        <p class="card-text">Amount Of Tickets Left: ${event.eventTicketAmount}</p>
+                        <p class="card-text">Description: ${aEvent.eventDescription}</p>
+                        <p class="card-text">Start Date: ${aEvent.eventStartDate}</p>
+                        <p class="card-text">Start Time: ${aEvent.eventStartTime}</p>
+                        <p class="card-text">End Date: ${aEvent.eventEndDate}</p>
+                        <p class="card-text">End Time: ${aEvent.eventEndTime}</p>
+                        <p class="card-text">Location: ${aEvent.eventBuildingNumber}, ${aEvent.eventStreetName}, ${aEvent.eventCity}, ${aEvent.eventCounty}, ${aEvent.eventCountry}, ${aEvent.eventPostCode}</p>
+                        <p class="card-text">Pricing: ${aEvent.eventPricing}</p>
+                        <p class="card-text">Price: £${aEvent.eventTicketPrice}</p>
+                        <p class="card-text">Amount Of Tickets Left: ${aEvent.eventTicketAmount}</p>
                         <form class="card-text">
                                     <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
                                     <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
                                     <div class="invalid-feedback add-to-cart-amount-feedback"
-                                    <button class="btn btn-warning" value="${event._id}" id="add-to-cart-button-${event._id}">Add To Event To Callendar And Cart</button>
+                                    <button class="btn btn-warning" value="${aEvent._id}" id="add-to-cart-button">Add To Event To Callendar And Cart</button>
                                 </form>
-                                <button class="btn btn-warning" value="${event._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
+                                <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
                                 <button class="btn btn-danger" id="delete-event">Delete Event</button>
                                 <p id="added-to-cart-feedback"></p>
                         </div>
@@ -105,16 +80,17 @@ function loadEvents () {
                     //const signUpToEventButton = document.querySelector('#btn-sign-up-to-event')
                     //signUpToEventButtonExport = signUpToEventButton
                     addedToCartFeedback.innerHTML = ""
-                    document.querySelector(`.add-to-cart-button-${event._id}`).addEventListener('click', function (event) {
+                    document.querySelector(`.add-to-cart-button`).addEventListener('click', function (event) {
                         event.preventDefault()
-                        if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > eventResponse.eventTicketAmount) {
+                        let eventID = event.target.value;
+                        if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > aEvent.eventTicketAmount) {
                             ticketAmountPurchase.className = "form-control is-invalid"
                             addToCartAmountFeedback.innerHTML = "Amount of tickets purchased field must not be empty or be greater than the amount of tickets available"
                         } else {
                             ticketAmountPurchase.className = "form-control"
                             addToCartAmountFeedback.innerHTML = ""
                             addedToCartFeedback.innerHTML = "Event successfully added to cart"
-                            eventCallendar.push(event)
+                            eventCallendar.push(eventID)
                         }
     
                 });
