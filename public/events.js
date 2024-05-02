@@ -58,7 +58,7 @@ function loadEvents () {
                                     <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
                                     <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
                                     <div class="invalid-feedback add-to-cart-amount-feedback"
-                                    <button class="btn btn-warning" value="${aEvent._id}" id="add-to-cart-button">Add To Event To Callendar And Cart</button>
+                                    <button class="btn btn-warning" value="${aEvent._id}" class="add-to-cart-button">Add To Event To Callendar And Cart</button>
                                 </form>
                                 <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
                                 <button class="btn btn-danger" id="delete-event">Delete Event</button>
@@ -80,7 +80,8 @@ function loadEvents () {
                     //const signUpToEventButton = document.querySelector('#btn-sign-up-to-event')
                     //signUpToEventButtonExport = signUpToEventButton
                     addedToCartFeedback.innerHTML = ""
-                    document.querySelector(`.add-to-cart-button`).addEventListener('click', function (event) {
+                    /*
+                    document.querySelector(`#add-to-cart-button`).addEventListener('click', function (event) {
                         event.preventDefault()
                         let eventID = event.target.value;
                         if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > aEvent.eventTicketAmount) {
@@ -92,8 +93,8 @@ function loadEvents () {
                             addedToCartFeedback.innerHTML = "Event successfully added to cart"
                             eventCallendar.push(eventID)
                         }
-    
-                });
+                    });
+                    */
             })
             .catch(function(err) {
                 console.log("Error: ", err)
