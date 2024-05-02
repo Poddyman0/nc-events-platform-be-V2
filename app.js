@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const express = require('express');
-//const cors = require('cors')
+const cors = require('cors')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -12,14 +12,7 @@ require('dotenv').config()
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  //res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
 
-  next();
-})
 
 
 const mongoose = require("mongoose");
@@ -39,7 +32,27 @@ const limiter = RateLimit({
 
 
 app.use(limiter);
+//added below
 
+app.use(cors())
+app.use(helmet());
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
+  next();
+});
+// added above
+
+/*
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  //res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
+
+  next();
+})
+*/
+/*
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -47,6 +60,7 @@ app.use(
     },
   }),
 );
+*/
 
 app.use(logger('dev'));
 app.use(express.json());
