@@ -12,7 +12,6 @@ const axios = require('axios');
 /////
 // POST request for creating a profile
 exports.profile_create_post = asyncHandler(async (req, res, next) => {
-    try {
         const aProfile = new Profile({
             profilePassword: req.body.profilePassword,
             profileTelephone: req.body.profileTelephone,
@@ -44,13 +43,9 @@ exports.profile_create_post = asyncHandler(async (req, res, next) => {
             }
         });
 
-        console.log('Success:', response.data);
+        console.log('Success:', response.data, response);
 
         res.status(200).send('Profile created successfully.');
-    } catch (error) {
-        console.error('Error creating profile:', error);
-        res.status(500).send('Error creating profile.');
-    }
 });
 
 // POST request to delete a profile

@@ -307,7 +307,7 @@ function signUpForm () {
                     }
                     // update URL below.
                     
-                    fetch('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', {
+                    fetch('/platform/profile/post', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", // or any other appropriate content type
