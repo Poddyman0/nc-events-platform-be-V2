@@ -46,15 +46,16 @@ app.use((req, res, next) => {
   next();
 })
 
-/*
+
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      "script-src": ["'self'", "*"],
-    },
+  helmet({
+    crossOriginOpenerPolicy: false,
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginResourcePolicy: false,
   }),
 );
-*/
+
 
 
 app.use(logger('dev'));
