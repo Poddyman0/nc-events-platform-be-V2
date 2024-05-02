@@ -1,6 +1,7 @@
 const Profile = require("../models/profile");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+const axios = require('axios');
 
 //TO DO:
 // - signIn (inc errors)
@@ -34,7 +35,22 @@ exports.profile_create_post = asyncHandler(async (req, res, next) => {
             profileSignedIn: req.body.profileSignedIn,
         });
         await aProfile.save();
-        res.send("Profile created.");
+        fetch('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json", // or any other appropriate content type
+                          },
+                        body: req.body
+                        })
+                        .then(response => {
+                        return response.json();
+                        })
+                        .then(data => {
+                        console.log('Success:', data);
+                        })
+                        .catch(error => {
+                        console.error('Error:', error);
+                        });
     } catch (error) {
         console.error("Error creating profile:", error);
         res.status(500).send("Error creating profile.");
