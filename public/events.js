@@ -4,26 +4,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 })
 
-let eventIDToView = ""
+export let eventIDToView = ""
 
-export function handleEventButtonClick(event) {
-    if (event) {
+function handleEventButtonClick(event) {
         eventIDToView = `${event.target.value}`;
         console.log("has event", eventIDToView);
         window.location.href = "/event.html";
         return eventIDToView
-
-    } if (!event) {
-        console.log("no event", eventIDToView)
-        return eventIDToView
-
-    }
-
 }
 
-let eventsDisplay = []
 
-let eventsArray = []
+
+//let eventsDisplay = []
+
+export let eventsArray = [];
+export let eventCallendar = [];
 
 
 
@@ -65,35 +60,70 @@ function loadEvents () {
     
                     }
                     */
+
                     eventsArray.push(event)
                     let aEventToDisplay = document.createElement('div')
                     aEventToDisplay.className = "card"
                     aEventToDisplay.id = `event-card-${event._id}`
                     aEventToDisplay.innerHTML = `
-                        <img class="card-img-top" src="${event.eventPicture}" alt="Event Picture">
                         <div class="card-body">
                             <div class="card-title-icon-container">
                                 <h5 class="card-title">${event.eventName}</h5>
                             </div>
                         <p class="card-text">Description: ${event.eventDescription}</p>
                         <p class="card-text">Start Date: ${event.eventStartDate}</p>
-                        <p class="card-text">Event City: ${event.eventCity}</p>
+                        <p class="card-text">Start Time: ${eventResponse.eventStartTime}</p>
+                        <p class="card-text">End Date: ${eventResponse.eventEndDate}</p>
+                        <p class="card-text">End Time: ${eventResponse.eventEndTime}</p>
+                        <p class="card-text">Location: ${eventResponse.eventBuildingNumber}, ${eventResponse.eventStreetName}, ${eventResponse.eventCity}, ${eventResponse.eventCounty}, ${eventResponse.eventCountry}, ${eventResponse.eventPostCode}</p>
+                        <p class="card-text">Pricing: ${eventResponse.eventPricing}</p>
                         <p class="card-text">Price: £${event.eventTicketPrice}</p>
-                        <button type="button" value="${event._id}" id="btn-event-card-${event._id}" class="btn btn-primary btn-events-info">Event Info</button>
+                        <p class="card-text">Amount Of Tickets Left: ${eventResponse.eventTicketAmount}</p>
+                        <form class="card-text">
+                                    <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
+                                    <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
+                                    <div class="invalid-feedback add-to-cart-amount-feedback"
+                                    <button class="btn btn-warning" value="${event._id}" id="add-to-cart-button-${event._id}">Add To Event To Callendar And Cart</button>
+                                </form>
+                                <button class="btn btn-warning" value="${event._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
+                                <button class="btn btn-danger" id="delete-event">Delete Event</button>
+                                <p id="added-to-cart-feedback"></p>
                         </div>
                     `
+                    //  <img class="card-img-top" src="${event.eventPicture}" alt="Event Picture">
+                    // button to view event: <button type="button" value="${event._id}" id="btn-event-card-${event._id}" class="btn btn-primary btn-events-info">Event Info</button>
+                    // delete event in event.js
                     eventDisplay.appendChild(aEventToDisplay)
 
-                    document.getElementById(`btn-event-card-${event._id}`).addEventListener('click', handleEventButtonClick);
-
-
+                    // button to view event: document.getElementById(`btn-event-card-${event._id}`).addEventListener('click', handleEventButtonClick);
+                    
+                    const ticketAmountPurchase = document.querySelector('#add-to-cart-amount')
+                    const addToCartAmountFeedback = document.querySelector('.add-to-cart-amount-feedback')
+                    const addedToCartFeedback = document.querySelector('#added-to-cart-feedback')
+                    //const updateEventButton = document.querySelector('#btn-update-event-internal')
+                    //updateEventButtonExport = updateEventButton
+                    //const signUpToEventButton = document.querySelector('#btn-sign-up-to-event')
+                    //signUpToEventButtonExport = signUpToEventButton
+                    addedToCartFeedback.innerHTML = ""
+                    document.querySelector(`add-to-cart-button-${event._id}`).addEventListener('click', function (event) {
+                        event.preventDefault()
+                        if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > eventResponse.eventTicketAmount) {
+                            ticketAmountPurchase.className = "form-control is-invalid"
+                            addToCartAmountFeedback.innerHTML = "Amount of tickets purchased field must not be empty or be greater than the amount of tickets available"
+                        } else {
+                            ticketAmountPurchase.className = "form-control"
+                            addToCartAmountFeedback.innerHTML = ""
+                            addedToCartFeedback.innerHTML = "Event successfully added to cart"
+                            eventCallendar.push(event)
+                        }
+    
                 });
             })
             .catch(function(err) {
                 console.log("Error: ", err)
             })
-        }
-
+        })
+    }
 }
 /*
             eventsDisplay = []
