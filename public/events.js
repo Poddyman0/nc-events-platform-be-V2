@@ -57,14 +57,15 @@ function loadEvents () {
                         <form class="card-text">
                                     <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
                                     <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
-                                    <div class="invalid-feedback add-to-cart-amount-feedback"
-                                    <button class="btn btn-warning add-to-cart-button" value="${aEvent._id}">Add To Event To Callendar And Cart</button>
+                                    <div class="invalid-feedback add-to-cart-amount-feedback"></div>
+                                    <button class="btn btn-warning add-to-cart-button" value="${aEvent}">Add To Event To Callendar And Cart</button>
                         </form>
-                        <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
                         <button class="btn btn-danger" id="delete-event">Delete Event</button>
                         <p id="added-to-cart-feedback"></p>
                         </div>
                     `
+                    //                         <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
+
                     //  <img class="card-img-top" src="${event.eventPicture}" alt="Event Picture">
                     // button to view event: <button type="button" value="${event._id}" id="btn-event-card-${event._id}" class="btn btn-primary btn-events-info">Event Info</button>
                     // delete event in event.js
@@ -80,10 +81,10 @@ function loadEvents () {
                     //const signUpToEventButton = document.querySelector('#btn-sign-up-to-event')
                     //signUpToEventButtonExport = signUpToEventButton
                     addedToCartFeedback.innerHTML = ""
-                    /*
+                    
                     document.querySelector(`#add-to-cart-button`).addEventListener('click', function (event) {
                         event.preventDefault()
-                        let eventID = event.target.value;
+                        let eventObj = event.target.value;
                         if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > aEvent.eventTicketAmount) {
                             ticketAmountPurchase.className = "form-control is-invalid"
                             addToCartAmountFeedback.innerHTML = "Amount of tickets purchased field must not be empty or be greater than the amount of tickets available"
@@ -91,10 +92,10 @@ function loadEvents () {
                             ticketAmountPurchase.className = "form-control"
                             addToCartAmountFeedback.innerHTML = ""
                             addedToCartFeedback.innerHTML = "Event successfully added to cart"
-                            eventCallendar.push(eventID)
+                            eventCallendar.push(eventObj)
                         }
                     });
-                    */
+                    
             })
             .catch(function(err) {
                 console.log("Error: ", err);
