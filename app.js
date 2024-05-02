@@ -1,12 +1,12 @@
 const createError = require("http-errors");
 const express = require('express');
-//const cors = require('cors')
+const cors = require('cors')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const platformRouter = require('./routes/platform'); 
-//const helmet = require("helmet");
+const helmet = require("helmet");
 const RateLimit = require("express-rate-limit");
 require('dotenv').config()
 
@@ -48,11 +48,10 @@ app.use((req, res, next) => {
 
 
 app.use(
-  helmet({
-    crossOriginOpenerPolicy: false,
-    contentSecurityPolicy: false,
-    crossOriginResourcePolicy: false,
-    crossOriginResourcePolicy: false,
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "*"],
+    },
   }),
 );
 
