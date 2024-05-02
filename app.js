@@ -16,7 +16,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
+  //res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
 
   next();
 })
@@ -43,7 +43,7 @@ app.use(limiter);
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+      "script-src": ["'self'", "*"],
     },
   }),
 );
