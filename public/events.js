@@ -27,9 +27,9 @@ function loadEvents () {
     const eventDisplay = document.querySelector('.card-container')
     fetchEvents ()
     function fetchEvents () {
-        fetch(`https://nc-events-platform-be-v2-production.up.railway.app/platform/events/get`, {
-            method: 'GET',
-        })
+            fetch(`https://nc-events-platform-be-v2-production.up.railway.app/platform/events/get`, {
+                method: 'GET',
+            })
             .then(function(response) {
                 return response.json();
             })
@@ -58,11 +58,11 @@ function loadEvents () {
                                     <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
                                     <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
                                     <div class="invalid-feedback add-to-cart-amount-feedback"
-                                    <button class="btn btn-warning" value="${aEvent._id}" class="add-to-cart-button">Add To Event To Callendar And Cart</button>
-                                </form>
-                                <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
-                                <button class="btn btn-danger" id="delete-event">Delete Event</button>
-                                <p id="added-to-cart-feedback"></p>
+                                    <button class="btn btn-warning add-to-cart-button" value="${aEvent._id}">Add To Event To Callendar And Cart</button>
+                        </form>
+                        <button class="btn btn-warning" value="${aEvent._id}" id="btn-sign-up-to-event">Sign Up To Event</button>
+                        <button class="btn btn-danger" id="delete-event">Delete Event</button>
+                        <p id="added-to-cart-feedback"></p>
                         </div>
                     `
                     //  <img class="card-img-top" src="${event.eventPicture}" alt="Event Picture">
@@ -97,7 +97,7 @@ function loadEvents () {
                     */
             })
             .catch(function(err) {
-                console.log("Error: ", err)
+                console.log("Error: ", err);
             })
         })
     }
