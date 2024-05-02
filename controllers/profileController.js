@@ -34,28 +34,24 @@ exports.profile_create_post = asyncHandler(async (req, res, next) => {
             profileCountry: req.body.profileCountry,
             profileSignedIn: req.body.profileSignedIn,
         });
+
         await aProfile.save();
-        fetch('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json", // or any other appropriate content type
-                          },
-                        body: req.body
-                        })
-                        .then(response => {
-                        return response.json();
-                        })
-                        .then(data => {
-                        console.log('Success:', data);
-                        })
-                        .catch(error => {
-                        console.error('Error:', error);
-                        });
+
+        // Make a POST request to another server
+        const response = await axios.post('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', req.body, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('Success:', response.data);
+
+        res.status(200).send('Profile created successfully.');
     } catch (error) {
-        console.error("Error creating profile:", error);
-        res.status(500).send("Error creating profile.");
+        console.error('Error creating profile:', error);
+        res.status(500).send('Error creating profile.');
     }
-})
+});
 
 // POST request to delete a profile
 exports.profile_delete_post = asyncHandler(async (req, res, next) => {

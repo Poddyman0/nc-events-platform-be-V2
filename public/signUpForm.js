@@ -306,8 +306,8 @@ function signUpForm () {
     
                     }
                     // update URL below.
-                    /*
-                    fetch('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', {
+                    
+                    fetch('/platform/profile/post', {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json", // or any other appropriate content type
@@ -323,7 +323,7 @@ function signUpForm () {
                         .catch(error => {
                         console.error('Error:', error);
                         });
-                        */
+                        
                 }
                 signedUpFeedback.style.display = "block"
                 signedUpFeedback.innerHTML = "You have successfilly signed up. Return to login page to sign in."
