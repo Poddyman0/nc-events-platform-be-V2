@@ -105,7 +105,7 @@ function loadEvents () {
                     //const signUpToEventButton = document.querySelector('#btn-sign-up-to-event')
                     //signUpToEventButtonExport = signUpToEventButton
                     addedToCartFeedback.innerHTML = ""
-                    document.querySelector(`add-to-cart-button-${event._id}`).addEventListener('click', function (event) {
+                    document.querySelector(`.add-to-cart-button-${event._id}`).addEventListener('click', function (event) {
                         event.preventDefault()
                         if (ticketAmountPurchase.value.length === 0 || ticketAmountPurchase.value > eventResponse.eventTicketAmount) {
                             ticketAmountPurchase.className = "form-control is-invalid"

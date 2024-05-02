@@ -45,7 +45,7 @@ app.use((req, res, next) => {
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      "script-src": ["'self'", "https://nc-events-platform-be-v2-production.up.railway.app/"],
+      "script-src": ["'self'", "*"],
     },
   }),
 );
