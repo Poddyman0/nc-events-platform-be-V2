@@ -55,9 +55,9 @@ function createProfile (req, res) {
 }
 
 exports.profile_create_post = asyncHandler(async (req, res, next) => {
-    const data = createProfile (req, res)
+    const data = createProfile (req)
     console.log("res", res, "data", data)
-    res.json(data)
+    res.send(data)
 
 });
 
