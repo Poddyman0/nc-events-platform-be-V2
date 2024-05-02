@@ -16,6 +16,8 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' http://nc-events-platform-be-v2-production.up.railway.app");
+
   next();
 })
 
