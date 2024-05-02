@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const express = require('express');
-const cors = require('cors')
+//const cors = require('cors')
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -12,7 +12,14 @@ require('dotenv').config()
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  //res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
 
+  next();
+})
 
 
 const mongoose = require("mongoose");
@@ -24,6 +31,7 @@ async function main() {
   await mongoose.connect(mongoDB);
 }
 
+
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 60,
@@ -32,20 +40,6 @@ const limiter = RateLimit({
 
 
 app.use(limiter);
-//added below
-
-
-
-
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  //res.setHeader("Content-Security-Policy", "default-src 'self'; connect-src 'self' *");
-
-  next();
-})
-
 
 app.use(
   helmet.contentSecurityPolicy({
@@ -54,8 +48,6 @@ app.use(
     },
   }),
 );
-
-
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -77,11 +69,10 @@ app.use((req, res, next) => {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
+      // render the error page
+      res.status(err.status || 500);
+      res.send("error");
+    });
   
-    // render the error page
-    res.status(err.status || 500);
-    res.send("error");
-  });
-
-
-module.exports = app;
+  
+  module.exports = app;
