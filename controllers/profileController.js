@@ -12,54 +12,59 @@ const axios = require('axios');
 /////
 // POST request for creating a profile
 
-function createProfile (req, res) {
+function createProfile(req, res, next) {
     asyncHandler(async (req, res, next) => {
-    
-        const aProfile = new Profile({
-            profilePassword: req.body.profilePassword,
-            profileTelephone: req.body.profileTelephone,
-            profileEmail: req.body.profileEmail,
-            profileFirstName: req.body.profileFirstName,
-            profileSecondName: req.body.profileSecondName,
-            profileDOB: req.body.profileDOB,
-            profileRole: req.body.profileRole,
-            profileCardHolderName: req.body.profileCardHolderName,
-            profileBankName: req.body.profileBankName,
-            profileCardNumber: req.body.profileCardNumber,
-            profileExpireyDate: req.body.profileExpireyDate,
-            profileCVV: req.body.profileCVV,
-            profilePostCode: req.body.profilePostCode,
-            profileHouseNumber: req.body.profileHouseNumber,
-            profileStreet: req.body.profileStreet,
-            profileCity: req.body.profileCity,
-            profileCounty: req.body.profileCounty,
-            profileCountry: req.body.profileCountry,
-            profileSignedIn: req.body.profileSignedIn,
-        });
+        try {
+            const aProfile = new Profile({
+                profilePassword: req.body.profilePassword,
+                profileTelephone: req.body.profileTelephone,
+                profileEmail: req.body.profileEmail,
+                profileFirstName: req.body.profileFirstName,
+                profileSecondName: req.body.profileSecondName,
+                profileDOB: req.body.profileDOB,
+                profileRole: req.body.profileRole,
+                profileCardHolderName: req.body.profileCardHolderName,
+                profileBankName: req.body.profileBankName,
+                profileCardNumber: req.body.profileCardNumber,
+                profileExpireyDate: req.body.profileExpireyDate,
+                profileCVV: req.body.profileCVV,
+                profilePostCode: req.body.profilePostCode,
+                profileHouseNumber: req.body.profileHouseNumber,
+                profileStreet: req.body.profileStreet,
+                profileCity: req.body.profileCity,
+                profileCounty: req.body.profileCounty,
+                profileCountry: req.body.profileCountry,
+                profileSignedIn: req.body.profileSignedIn,
+            });
 
-        await aProfile.save();
+            // Save the profile
+            await aProfile.save();
 
-        // Make a POST request to another server
-        const response = await axios.post('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', req.body, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
+            // Make a POST request to another server
+            const response = await axios.post('https://nc-events-platform-be-v2-production.up.railway.app/platform/profile/post', req.body, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-        console.log('Success:', response.data, response);
+            console.log('Success:', response.data, response);
 
-        res.status(200).send('Profile created successfully.');
-    
-    
+            // Send a success response
+            res.status(200).send('Profile created successfully.');
+        } catch (error) {
+            // Handle errors
+            console.error('Error creating profile:', error);
+            next(error); // Pass the error to Express's error handling middleware
+        }
     })
 }
 
 exports.profile_create_post = asyncHandler(async (req, res, next) => {
-    const data = createProfile (req)
-    console.log("res", res, "data", data)
+    const data = createProfile(req, res, next);
     res.send(data)
-
+    console.log("res", res, "data", data)
 });
+
 
 // POST request to delete a profile
 exports.profile_delete_post = asyncHandler(async (req, res, next) => {
