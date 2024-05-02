@@ -72,13 +72,13 @@ function loadEvents () {
                             </div>
                         <p class="card-text">Description: ${event.eventDescription}</p>
                         <p class="card-text">Start Date: ${event.eventStartDate}</p>
-                        <p class="card-text">Start Time: ${eventResponse.eventStartTime}</p>
-                        <p class="card-text">End Date: ${eventResponse.eventEndDate}</p>
-                        <p class="card-text">End Time: ${eventResponse.eventEndTime}</p>
-                        <p class="card-text">Location: ${eventResponse.eventBuildingNumber}, ${eventResponse.eventStreetName}, ${eventResponse.eventCity}, ${eventResponse.eventCounty}, ${eventResponse.eventCountry}, ${eventResponse.eventPostCode}</p>
-                        <p class="card-text">Pricing: ${eventResponse.eventPricing}</p>
+                        <p class="card-text">Start Time: ${event.eventStartTime}</p>
+                        <p class="card-text">End Date: ${event.eventEndDate}</p>
+                        <p class="card-text">End Time: ${event.eventEndTime}</p>
+                        <p class="card-text">Location: ${event.eventBuildingNumber}, ${event.eventStreetName}, ${event.eventCity}, ${event.eventCounty}, ${event.eventCountry}, ${event.eventPostCode}</p>
+                        <p class="card-text">Pricing: ${event.eventPricing}</p>
                         <p class="card-text">Price: £${event.eventTicketPrice}</p>
-                        <p class="card-text">Amount Of Tickets Left: ${eventResponse.eventTicketAmount}</p>
+                        <p class="card-text">Amount Of Tickets Left: ${event.eventTicketAmount}</p>
                         <form class="card-text">
                                     <label for="add-to-cart-amount">Amount of tickets you want to purchase:</label>
                                     <input type="number" class="form-control" id="add-to-cart-amount" placeholder="Enter amount of tickets you would like to buy." required>
