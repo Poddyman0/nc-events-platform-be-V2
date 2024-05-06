@@ -112,12 +112,15 @@ exports.profile_update_post = asyncHandler(async (req, res, next) => {
 
 // GET request to get a Profile.
 exports.profile_get = asyncHandler(async (req, res, next) => {
-    const aProfile = await Profile.findById(req.params.id).exec();
+    const aProfile = await Profile.find({ _id: req.params.id}).exec();
+    //const aProfileID = await Profile.find({ profileID: req.params.id}).exec();
+
     if (aProfile === null) {
         const err = new Error("Profile not found");
         err.status = 404
         return next(err)
     }
+    //aProfileID
     res.send(aProfile)
 })
 
