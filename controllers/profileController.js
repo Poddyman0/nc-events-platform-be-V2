@@ -2,7 +2,11 @@ const Profile = require("../models/profile");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
 const jwt = require('jsonwebtoken')
+const passport = require("passport");
+const bcrypt = require('bcryptjs');
 
+const saltRounds = 12;
+const plainPassword = 'password';
 //TO DO:
 // - signIn (inc errors)
 
@@ -11,6 +15,7 @@ const jwt = require('jsonwebtoken')
 
 /////
 // POST request for creating a profile
+
 
 exports.profile_create_post = [
     body("profilePassword", "profilePassword must contain at least 1 characters")
@@ -105,44 +110,52 @@ exports.profile_create_post = [
             .isBoolean()
             .withMessage("profileSignedIn must be a boolean of either true or false")
             .escape(),
-    asyncHandler(async (req, res, next) => {     
-            const errors = validationResult(req);
-            console.log(req.body)
-            const aProfile = new Profile({
-                profilePassword: req.body.profilePassword,
-                profileTelephone: req.body.profileTelephone,
-                profileEmail: req.body.profileEmail,
-                profileFirstName: req.body.profileFirstName,
-                profileSecondName: req.body.profileSecondName,
-                profileDOB: req.body.profileDOB,
-                profileRole: req.body.profileRole,
-                profileCardHolderName: req.body.profileCardHolderName,
-                profileBankName: req.body.profileBankName,
-                profileCardNumber: req.body.profileCardNumber,
-                profileExpireyDate: req.body.profileExpireyDate,
-                profileCVV: req.body.profileCVV,
-                profilePostCode: req.body.profilePostCode,
-                profileHouseNumber: req.body.profileHouseNumber,
-                profileStreet: req.body.profileStreet,
-                profileCity: req.body.profileCity,
-                profileCounty: req.body.profileCounty,
-                profileCountry: req.body.profileCountry,
-                profileSignedIn: req.body.profileSignedIn,
-            });
-            if (!errors.isEmpty()) {
-              res.json({
-                  profile: aProfile,
-                  errors: errors.array(),
-                  msg: "errors",
-              }) 
-            } else {
-              await aProfile.save();
-              res.json({
-                  profile: aProfile,
-                  msg: "Profile Created Successfully",
-              })
-            } 
-})
+            asyncHandler(async (req, res, next) => {
+                const errors = validationResult(req);
+            
+                if (!errors.isEmpty()) {
+                  return res.status(400).json({
+                    errors: errors.array(),
+                    msg: "Validation errors occurred",
+                  });
+                }
+            
+                const passwordToHash = req.body.profilePassword;
+            
+                try {
+                  const hashedPassword = await bcrypt.hash(passwordToHash, saltRounds);
+            
+                  const aProfile = new Profile({
+                    profilePassword: hashedPassword,
+                    profileTelephone: req.body.profileTelephone,
+                    profileEmail: req.body.profileEmail,
+                    profileFirstName: req.body.profileFirstName,
+                    profileSecondName: req.body.profileSecondName,
+                    profileDOB: req.body.profileDOB,
+                    profileRole: req.body.profileRole,
+                    profileCardHolderName: req.body.profileCardHolderName,
+                    profileBankName: req.body.profileBankName,
+                    profileCardNumber: req.body.profileCardNumber,
+                    profileExpireyDate: req.body.profileExpireyDate,
+                    profileCVV: req.body.profileCVV,
+                    profilePostCode: req.body.profilePostCode,
+                    profileHouseNumber: req.body.profileHouseNumber,
+                    profileStreet: req.body.profileStreet,
+                    profileCity: req.body.profileCity,
+                    profileCounty: req.body.profileCounty,
+                    profileCountry: req.body.profileCountry,
+                    profileSignedIn: req.body.profileSignedIn,
+                  });
+            
+                  await aProfile.save();
+                  res.json({
+                    profile: aProfile,
+                    msg: "Profile Created Successfully",
+                  });
+                } catch (err) {
+                  next(err);
+                }
+              }),
 ]
 
 
@@ -310,7 +323,6 @@ exports.profile_update_post = [
 // GET request to get a Profile.
 exports.profile_get = asyncHandler(async (req, res, next) => {
     const aProfile = await Profile.find({ _id: req.params.id}).exec();
-    console.log("aProfile", aProfile)
     if (!aProfile) {
         res.json({
             profile: aProfile,
@@ -331,10 +343,10 @@ exports.profile_sign_out_post = (req, res) => {
           if (err) {
             return next(err); // Passes any errors to the error handler
           }
-          res.json("user_logout", { user: null }); // User is now logged out, so pass null
+          res.json({ user: null, message: "User logged out successfully" }); // User is now logged out, so pass null
         });
       } else {
-        res.json("user_logout", { user: null });
+        res.json({ user: null, message: "res.locals.currentUser does not exist" });
       }
 }
 
@@ -347,41 +359,43 @@ exports.profile_sign_out_post = (req, res) => {
 // POST request to update and sign in to a profile
 exports.profile_sign_in_post = asyncHandler(async (req, res, next) => {
     try {
-        console.log("Login POST request received");
     
       const profileDB = await Profile.find({profileEmail: req.body.profileEmail}).exec()
-      console.log("User found in database: ", profileDB);
-    
+      if (profileDB.length === 0) {
+        return res.json({ message: "Incorrect email" });
+    }
       const userEmail = `${profileDB[0].profileEmail}`
       const reqUserEmail = `${req.body.profileEmail}`
-      const userPassword = `${profileDB[0].profilePassword}`
-      const reqUserPassword = `${req.body.profilePassword}`
+      const userPassword = profileDB[0].profilePassword;
+      const reqUserPassword = req.body.profilePassword;
       if (userEmail === reqUserEmail) {
-        console.log("Email match")
+        //
         if (userPassword === reqUserPassword) {
-          console.log("password match")
+            console.log("user password", userPassword)
+            console.log("req user password", reqUserPassword)
+            console.log("bcrpt print", bcrypt.compareSync(reqUserPassword, userPassword))
+
           const userDBID = profileDB[0]._id;
           const token = jwt.sign({userID: userDBID}, 'passwordKey')
           res.status(200).json({
             userIDSignInCreated: userDBID,
             userIsAuthor: profileDB[0].isAuthor,
             message: "JWT Auth Creation Passed",
-            token: token
+            token: token,
+            PassportCurrentUser: res.locals.currentUser
         })
         } else {
-          console.log("Password not found");
           res.json({ message: "Incorrect password" });
         }
       } else {
-        console.log("Email not found");
     
         res.json({ message: "Incorrect email" });
       }
     }
     catch (error) {
-      console.log("Error in login POST: ", error);
     
       next(error);
     }
 })
+
 

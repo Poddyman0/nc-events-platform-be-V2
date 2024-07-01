@@ -61,6 +61,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use("/platform", platformRouter);
 
+app.use(session({ secret: "secret", resave: false, saveUninitialized: true }));
+app.use(passport.session());
+app.use(express.urlencoded({ extended: false }));
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

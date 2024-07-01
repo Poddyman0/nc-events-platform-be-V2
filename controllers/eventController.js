@@ -109,6 +109,7 @@ exports.event_delete_post = asyncHandler(async (req, res, next) => {
 
 // GET request to get all events
 exports.events_get = asyncHandler(async (req, res, next) => {
+    console.log("currUser", res.locals.currentUser)
     const allEvents = await Event.find({}).exec();
     const allProfiles = await Profile.find({}).exec();
     let allEventsCopy = []
@@ -376,26 +377,21 @@ exports.getAAtendeeForAEvent = asyncHandler(async (req, res, next) => {
             aEventCopy.eventOrganiser._id = user._id
         }
     })
-        aEvent.eventAtendees.forEach(EAID => {
+    aEvent.eventAtendees.forEach(EAID => {
             let eventAtendeeID = `${EAID}`
             let profileID = `${aAtendeeForAEvent._id}`
-            let aEventAtendee = {}
-            aEventAtendee._id = aAtendeeForAEvent._id
-            aEventAtendee.profileFirstName = aAtendeeForAEvent.profileFirstName
-            aEventAtendee.profileSecondName = aAtendeeForAEvent.profileSecondName
-            aEventAtendee.profileRole = aAtendeeForAEvent.profileRole
-
 
             if (eventAtendeeID === profileID) {
+                console.log("match")
                     let eventAtendee = {}
-                    eventAtendee._id = user._id
-                    eventAtendee.profileFirstName = user.profileFirstName
-                    eventAtendee.profileSecondName = user.profileSecondName
-                    eventAtendee.profileRole = user.profileRole
-                    eventAtendee._v = user._v
+                    eventAtendee._id = aAtendeeForAEvent._id
+                    eventAtendee.profileFirstName = aAtendeeForAEvent.profileFirstName
+                    eventAtendee.profileSecondName = aAtendeeForAEvent.profileSecondName
+                    eventAtendee.profileRole = aAtendeeForAEvent.profileRole
+                    eventAtendee._v = aAtendeeForAEvent._v
                     aEventCopy.eventAtendees.push(eventAtendee)
             }
-        }) 
+    })
      if (!aEvent) {
         res.json({
             event: aEventCopy,
@@ -420,7 +416,8 @@ exports.getAAtendeeForAEvent = asyncHandler(async (req, res, next) => {
 })
 
 exports.createAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
-        const eventToUpdate = Event.findById(req.params.eventID).exec()
+        const eventToUpdate = await Event.findById(req.params.eventID).exec()
+        console.log("eventToUpdate", eventToUpdate)
         if (!eventToUpdate) {
             res.json({
                 event: eventToUpdate,
@@ -438,9 +435,9 @@ exports.createAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
 })
 
 exports.deleteAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
-    const eventToDelete = Event.findById(req.params.eventID).exec()
+    const eventToDelete = await Event.findById(req.params.eventID).exec()
     let atendeeIDString = `${req.params.atendeeID}`
-    const index = eventToDelete.eventAtendees.indexOf(atendeeIDString).exec()
+    const index = eventToDelete.eventAtendees.indexOf(atendeeIDString)
     if (index !== -1) {
         eventToDelete.eventAtendees.splice(index, 1);
     }
