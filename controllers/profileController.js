@@ -4,9 +4,8 @@ const { body, validationResult } = require("express-validator");
 const jwt = require('jsonwebtoken')
 const passport = require("passport");
 const bcrypt = require('bcryptjs');
+const he = require('he');
 
-const saltRounds = 12;
-const plainPassword = 'password';
 //TO DO:
 // - signIn (inc errors)
 
@@ -123,7 +122,8 @@ exports.profile_create_post = [
                 const passwordToHash = req.body.profilePassword;
             
                 try {
-                  const hashedPassword = await bcrypt.hash(passwordToHash, saltRounds);
+                  const salt = bcrypt.genSaltSync(12);
+                  const hashedPassword = bcrypt.hashSync(passwordToHash, salt);
             
                   const aProfile = new Profile({
                     profilePassword: hashedPassword,
@@ -164,6 +164,7 @@ exports.profile_delete_post = asyncHandler(async (req, res, next) => {
     const aProfileExists = await Profile.findById(req.params.id)
     let errors = []
     let profileIDToDelete = req.params.id
+    console.log("PE", aProfileExists)
     if (profileIDToDelete === null) {
         errors.push("Profile ID does not exist")
         res.json({
@@ -219,7 +220,7 @@ exports.profile_update_post = [
     body("profileRole", "profileRole  must contain at least 1 characters")
         .trim()
         .isLength({ min: 1 })
-        .withMessage("profilePassword  must contain at least 1 characters")
+        .withMessage("profileRole  must contain at least 1 characters")
         .escape(),
     body("profileCardHolderName", "profileCardHolderName must contain at least 1 characters")
         .trim()
@@ -279,9 +280,12 @@ exports.profile_update_post = [
             .withMessage("profileSignedIn must be a boolean of either true or false")
             .escape(),
     asyncHandler(async (req, res, next) => {     
+      const salt = bcrypt.genSaltSync(12);
+      const passwordToHash = req.body.profilePassword
+      const hashedPassword = bcrypt.hashSync(passwordToHash, salt);
             const errors = validationResult(req);
             const aProfile = new Profile({
-                profilePassword: req.body.profilePassword,
+                profilePassword: hashedPassword,
                 profileTelephone: req.body.profileTelephone,
                 profileEmail: req.body.profileEmail,
                 profileFirstName: req.body.profileFirstName,
@@ -320,20 +324,54 @@ exports.profile_update_post = [
 ]
 
 
+
 // GET request to get a Profile.
 exports.profile_get = asyncHandler(async (req, res, next) => {
     const aProfile = await Profile.find({ _id: req.params.id}).exec();
+    
     if (!aProfile) {
         res.json({
             profile: aProfile,
-            msg: "Profile get unsuccessfull as event does not exist"
+            msg: "Profile get unsuccessfull as profile does not exist"
         })
     } else {
+
         res.json({
             profile: aProfile,
             msg: "Profile get successfull"
         })
     }
+})
+
+// GET request to get all profiles.
+exports.profiles_get = asyncHandler(async (req, res, next) => {
+  const profiles = await Profile.find({}).exec();
+  let allProfiles = []
+  let aProfile = {}
+  profiles.forEach(profile => {
+    aProfile = {}
+    aProfile.profileFirstName = profile.profileFirstName
+    aProfile.profileSecondName = profile.profileSecondName
+    aProfile.profileEmail = profile.profileEmail
+    aProfile._id = profile._id
+    allProfiles.push(aProfile)
+  })
+
+  console.log(allProfiles)
+  if (!profiles) {
+      res.json({
+          profiles: allProfiles,
+          msg: "Profiles get unsuccessfull as profile does not exist"
+      })
+  } else {
+    if (allProfiles.length === profiles.length) {
+      res.json({
+        profiles: allProfiles,
+        msg: "Profiles get successfull"
+    })
+    }
+
+  }
 })
 
 // POST request to update and sign out of  a Profile.
@@ -369,20 +407,16 @@ exports.profile_sign_in_post = asyncHandler(async (req, res, next) => {
       const userPassword = profileDB[0].profilePassword;
       const reqUserPassword = req.body.profilePassword;
       if (userEmail === reqUserEmail) {
-        //
-        if (userPassword === reqUserPassword) {
-            console.log("user password", userPassword)
-            console.log("req user password", reqUserPassword)
-            console.log("bcrpt print", bcrypt.compareSync(reqUserPassword, userPassword))
-
+            const isMatch = bcrypt.compareSync(reqUserPassword, userPassword)
+        if (isMatch) {
           const userDBID = profileDB[0]._id;
+          const userRole = profileDB[0].profileRole
           const token = jwt.sign({userID: userDBID}, 'passwordKey')
           res.status(200).json({
             userIDSignInCreated: userDBID,
-            userIsAuthor: profileDB[0].isAuthor,
+            userIsAuthor: userRole,
             message: "JWT Auth Creation Passed",
             token: token,
-            PassportCurrentUser: res.locals.currentUser
         })
         } else {
           res.json({ message: "Incorrect password" });

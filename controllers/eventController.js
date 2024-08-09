@@ -49,6 +49,8 @@ exports.event_create_post = [
         .isLength({ min: 1 }).withMessage('eventEndTime must have at least 1 character'),
     body("eventAtendees", "eventAtendees must contain at least 1 characters")
         .isArray().withMessage('eventAtendees must have at least 1 character'),
+    body("eventInvited", "eventInvited must contain at least 1 characters")
+        .isArray().withMessage('eventInvited must have at least 1 character'),
     asyncHandler(async (req, res, next) => {
     const aEvent = new Event({
         eventOrganiser: req.body.eventOrganiser,
@@ -69,6 +71,7 @@ exports.event_create_post = [
         eventTicketAmount: req.body.eventTicketAmount,
         eventPicture: req.body.eventPicture,
         eventAtendees: req.body.eventAtendees,
+        eventInvited: req.body.eventInvited
       });
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -91,7 +94,9 @@ exports.event_create_post = [
 exports.event_delete_post = asyncHandler(async (req, res, next) => {
     const aEventExists = await Event.findById(req.params.id).exec();
     let errors = []
-    if (postIDToDelete === null) {
+    let eventIDToDelete = req.params.id
+    console.log("EE", aEventExists)
+    if (eventIDToDelete === null) {
         errors.push("Event ID does not exist")
         res.json({
             event: aEventExists,
@@ -115,6 +120,7 @@ exports.events_get = asyncHandler(async (req, res, next) => {
     let allEventsCopy = []
     let aEventCopy = {}
     allEvents.forEach(event => {
+        console.log("event", event)
         aEventCopy = {};
         aEventCopy._id = event._id
         aEventCopy.eventOrganiser = {}
@@ -135,6 +141,8 @@ exports.events_get = asyncHandler(async (req, res, next) => {
         aEventCopy.eventTicketAmount = event.eventTicketAmount
         aEventCopy.eventPicture = event.eventPicture
         aEventCopy.eventAtendees = []
+        aEventCopy.eventInvited = []
+
         allProfiles.forEach(user => {
             let profileID = `${user._id}`
             let eventOrganiserID = `${event.eventOrganiser}`
@@ -162,18 +170,33 @@ exports.events_get = asyncHandler(async (req, res, next) => {
                         aEventCopy.eventAtendees.push(eventAtendee)
 
                     }
+                    })
                 })
-                if (aEventCopy.eventAtendees.length === event.eventAtendees.length) {
-                    allEventsCopy.push(aEventCopy)
+        } 
+        if (event.eventInvited.length > 0) {
+            event.eventInvited.forEach(EAID => {
+                let eventAtendeeID = `${EAID}`
+                allProfiles.forEach(user => {
+                    let profileID = `${user._id}`
+                    if (eventAtendeeID === profileID) {
 
-                }
-            }) 
+                        let eventAtendee = {}
+                        eventAtendee._id = user._id
+                        eventAtendee.profileFirstName = user.profileFirstName
+                        eventAtendee.profileSecondName = user.profileSecondName
+                        eventAtendee.profileRole = user.profileRole
 
-        } else {
-            allEventsCopy.push(aEventCopy)
-            console.log("allEventsCopy", allEventsCopy)
+                        aEventCopy.eventInvited.push(eventAtendee)
 
+                    }
+                })
+            })
         }
+        if (aEventCopy.eventAtendees.length === event.eventAtendees.length && aEventCopy.eventInvited.length === event.eventInvited.length) {
+                
+            allEventsCopy.push(aEventCopy)
+        }
+        
     })
     if (!allEvents) {
         res.json({
@@ -186,6 +209,7 @@ exports.events_get = asyncHandler(async (req, res, next) => {
             msg: "Events get unsuccessfull as all profiles do not exist"
         })
     } else {
+        console.log("allEventsCopy", allEventsCopy)
         res.json({
             events: allEventsCopy,
             msg: "Events get successfull"
@@ -217,6 +241,8 @@ exports.event_get = asyncHandler(async (req, res, next) => {
     aEventCopy.eventTicketAmount = aEvent.eventTicketAmount
     aEventCopy.eventPicture = aEvent.eventPicture
     aEventCopy.eventAtendees = []
+    aEventCopy.eventInvited= []
+
     allProfiles.forEach(user => {
         let profileID = `${user._id}`
         let eventOrganiserID = `${aEvent.eventOrganiser}`
@@ -237,11 +263,31 @@ exports.event_get = asyncHandler(async (req, res, next) => {
                     eventAtendee.profileFirstName = user.profileFirstName
                     eventAtendee.profileSecondName = user.profileSecondName
                     eventAtendee.profileRole = user.profileRole
+                    eventAtendee.profileEmail = user.profileEmail
+
                     eventAtendee._v = user._v
                     aEventCopy.eventAtendees.push(eventAtendee)
                 }
             })
         }) 
+        aEvent.eventInvited.forEach(EAID => {
+            let eventAtendeeID = `${EAID}`
+            allProfiles.forEach(user => {
+                let profileID = `${user._id}`
+                if (eventAtendeeID === profileID) {
+                    let eventAtendee = {}
+                    eventAtendee._id = user._id
+                    eventAtendee.profileFirstName = user.profileFirstName
+                    eventAtendee.profileSecondName = user.profileSecondName
+                    eventAtendee.profileRole = user.profileRole
+                    eventAtendee.profileEmail = user.profileEmail
+
+                    eventAtendee._v = user._v
+                    aEventCopy.eventInvited.push(eventAtendee)
+                }
+            })
+        }) 
+        console.log("a event copy", aEventCopy)
      if (!aEvent) {
         res.json({
             event: aEventCopy,
@@ -302,6 +348,8 @@ exports.event_update_post = [
         .isLength({ min: 1 }).withMessage('eventEndTime must have at least 1 character'),
     body("eventAtendees", "eventAtendees must contain at least 1 characters")
         .isArray().withMessage('eventAtendees must have at least 1 character'),
+    body("eventInvited", "eventInvited must contain at least 1 characters")
+        .isArray().withMessage('eventInvited must have at least 1 character'),
     asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
     const eventToUpdate = Event.findById(req.params.postID).exec();
@@ -324,6 +372,7 @@ exports.event_update_post = [
         eventTicketAmount: req.body.eventTicketAmount,
         eventPicture: req.body.eventPicture,
         eventAtendees: req.body.eventAtendees,
+        eventInvited: req.body.eventInvited,
         _id: req.params.id, // This is required, or a new ID will be assigned!
       });
       if (!errors.isEmpty()) {
@@ -415,24 +464,47 @@ exports.getAAtendeeForAEvent = asyncHandler(async (req, res, next) => {
     }
 })
 
-exports.createAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
+exports.createAAtendeeForAEvent = [
+    body("eventID", "eventID must contain at least 1 characters")
+        .isLength({ min: 1 }).withMessage('eventID must have at least 1 character'),
+    body("eventTicketAmountBrought",  "eventTicketAmountBrought must be a number.")
+        .isNumeric()
+        .withMessage("eventTicketAmountBrought must be a number")
+        .escape(),
+    body("eventAtendee", "eventAtendee must contain at least 1 characters")
+        .isLength({ min: 1 }).withMessage('eventAtendee must have at least 1 character'),
+    asyncHandler(async (req, res, next) => {
+        const errors = validationResult(req);
+        console.log("reqBodyEventTicketAmountBrought", req.body.eventTicketAmountBrought)
+        console.log("reqParamsEventID", req.params.eventID)
+        console.log("reqParamsAtendeeID", req.params.atendeeID)
+
         const eventToUpdate = await Event.findById(req.params.eventID).exec()
         console.log("eventToUpdate", eventToUpdate)
-        if (!eventToUpdate) {
+        //newEvent
+        const atendeeIDString = `${req.params.atendeeID}`
+        eventToUpdate.eventAtendees.push(atendeeIDString)
+        const eventTicketAmountBrought = parseFloat(req.body.eventTicketAmountBrought)
+        const totalTickets = eventToUpdate.eventTicketAmount - eventTicketAmountBrought
+        eventToUpdate.eventTicketAmount = totalTickets
+        console.log("updated ticket amount", eventToUpdate.eventTicketAmount)
+
+        if (!errors.isEmpty()) {
             res.json({
                 event: eventToUpdate,
-                msg: "Event ID not found in database",
+                errors: errors.array(),
+                msg: "errors",
             }) 
         } else {
-            const atendeeIDString = `${req.params.atendeeID}`
-            eventToUpdate.eventAtendees.push(atendeeIDString)
-            await eventToUpdate.save()
+            const atendeeSaved = await eventToUpdate.save()
+            console.log(atendeeSaved)
             res.json({
                 event: eventToUpdate, 
                 msg: "Event Atendee Updated Successfully",
             })
         }
-})
+    })
+]
 
 exports.deleteAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
     const eventToDelete = await Event.findById(req.params.eventID).exec()
@@ -458,4 +530,163 @@ exports.deleteAAtendeeForAEvent  = asyncHandler(async (req, res, next) => {
     }
 })
 
+exports.getAInviteeForAEvent = asyncHandler(async (req, res, next) => {
+    console.log("hi")
+    const aEvent = await Event.findById(req.params.eventID).exec()
+    const aAtendeeForAEvent = await Profile.findById(req.params.atendeeID).exec()
+    const allProfiles = await Profile.find({}).exec()
+    let aEventCopy = {};
+    aEventCopy._id = aEvent._id
+    aEventCopy.eventOrganiser = {}
+    aEventCopy.eventName = aEvent.eventName
+    aEventCopy.eventDescription = aEvent.eventDescription
+    aEventCopy.eventStartDate = aEvent.eventStartDate
+    aEventCopy.eventStartTime = aEvent.eventStartTime
+    aEventCopy.eventEndDate = aEvent.eventEndDate
+    aEventCopy.eventEndTime = aEvent.eventEndTime
+    aEventCopy.eventBuildingNumber = aEvent.eventBuildingNumber
+    aEventCopy.eventStreetName = aEvent.eventStreetName
+    aEventCopy.eventCity = aEvent.eventCity
+    aEventCopy.eventCounty = aEvent.eventCounty
+    aEventCopy.eventCountry =aEvent.eventCountry
+    aEventCopy.eventPostCode = aEvent.eventPostCode
+    aEventCopy.eventPricing = aEvent.eventPricing
+    aEventCopy.eventTicketPrice = aEvent.eventTicketPrice
+    aEventCopy.eventTicketAmount = aEvent.eventTicketAmount
+    aEventCopy.eventPicture = aEvent.eventPicture
+    aEventCopy.eventAtendees = []
+    aEventCopy.eventInvited = []
+
+    allProfiles.forEach(user => {
+        let profileID = `${user._id}`
+        let eventOrganiserID = `${aEvent.eventOrganiser}`
+        if (eventOrganiserID === profileID) {
+            aEventCopy.eventOrganiser.profileFirstName = user.profileFirstName
+            aEventCopy.eventOrganiser.profileSecondName = user.profileSecondName
+            aEventCopy.eventOrganiser.profileRole = user.profileRole
+            aEventCopy.eventOrganiser._id = user._id
+        }
+    })
+    aEvent.eventAtendees.forEach(EAID => {
+            let eventAtendeeID = `${EAID}`
+            let profileID = `${aAtendeeForAEvent._id}`
+
+            if (eventAtendeeID === profileID) {
+                console.log("match")
+                    let eventAtendee = {}
+                    eventAtendee._id = aAtendeeForAEvent._id
+                    eventAtendee.profileFirstName = aAtendeeForAEvent.profileFirstName
+                    eventAtendee.profileSecondName = aAtendeeForAEvent.profileSecondName
+                    eventAtendee.profileRole = aAtendeeForAEvent.profileRole
+                    eventAtendee._v = aAtendeeForAEvent._v
+                    aEventCopy.eventAtendees.push(eventAtendee)
+            }
+    })
+    aEvent.eventInvited.forEach(EAID => {
+        let eventAtendeeID = `${EAID}`
+        allProfiles.forEach(user => {
+            let profileID = `${user._id}`
+            if (eventAtendeeID === profileID) {
+                let eventAtendee = {}
+                eventAtendee._id = user._id
+                eventAtendee.profileFirstName = user.profileFirstName
+                eventAtendee.profileSecondName = user.profileSecondName
+                eventAtendee.profileRole = user.profileRole
+                eventAtendee.profileEmail = user.profileEmail
+
+                eventAtendee._v = user._v
+                aEventCopy.eventInvited.push(eventAtendee)
+            }
+        })
+    }) 
+     if (!aEvent) {
+        res.json({
+            event: aEventCopy,
+            msg: "Event get unsuccessfull as event does not exist"
+        })
+    } else if (!allProfiles) {
+        res.json({
+            event: aEventCopy,
+            msg: "Events get unsuccessfull as all profiles do not exist"
+        })
+    } else if (!aAtendeeForAEvent) {
+        res.json({
+            event: aEventCopy,
+            msg: "Events get unsuccessfull as a profile does exist"
+        })
+    } else {
+        res.json({
+            event: aEventCopy,
+            msg: "Event get successfull"
+        })
+    }
+})
+
+exports.createAInviteeForAEvent = [
+    body("eventID", "eventID must contain at least 1 characters")
+        .isLength({ min: 1 }).withMessage('eventID must have at least 1 character'),
+    body("eventTicketAmountBrought",  "eventTicketAmountBrought must be a number.")
+        .isNumeric()
+        .withMessage("eventTicketAmountBrought must be a number")
+        .escape(),
+    body("eventInvitee", "eventInvitee must contain at least 1 characters")
+        .isLength({ min: 1 }).withMessage('eventInvitee must have at least 1 character'),
+    asyncHandler(async (req, res, next) => {
+        const errors = validationResult(req);
+        console.log("reqBodyEventTicketAmountBrought", req.body.eventTicketAmountBrought)
+        console.log("reqParamsEventID", req.params.eventID)
+        console.log("reqParamsAtendeeID", req.params.InviteeID)
+
+        const eventToUpdate = await Event.findById(req.params.eventID).exec()
+        console.log("eventToUpdate", eventToUpdate)
+        //newEvent
+        const atendeeIDString = `${req.params.atendeeID}`
+        eventToUpdate.eventAtendees.push(atendeeIDString)
+        const eventTicketAmountBrought = parseFloat(req.body.eventTicketAmountBrought)
+        const totalTickets = eventToUpdate.eventTicketAmount - eventTicketAmountBrought
+        eventToUpdate.eventTicketAmount = totalTickets
+        console.log("updated ticket amount", eventToUpdate.eventTicketAmount)
+
+        if (!errors.isEmpty()) {
+            res.json({
+                event: eventToUpdate,
+                errors: errors.array(),
+                msg: "errors",
+            }) 
+        } else {
+            const atendeeSaved = await eventToUpdate.save()
+            console.log(atendeeSaved)
+            res.json({
+                event: eventToUpdate, 
+                msg: "Event Atendee Updated Successfully",
+            })
+        }
+    })
+]
+
+exports.deleteAInviteeForAEvent  = asyncHandler(async (req, res, next) => {
+    const eventToDelete = await Event.findById(req.params.eventID).exec()
+    let inviteeIDString = `${req.params.inviteeID}`
+    console.log("inviteeIDString", inviteeIDString)
+
+    const index = eventToDelete.eventInvited.indexOf(inviteeIDString)
+    if (index !== -1) {
+        eventToDelete.eventInvited.splice(index, 1);
+    }
+    let errors = []
+    if (eventToDelete === null) {
+        errors.push("Event ID does not exist")
+        res.json({
+            event: eventToDelete,
+            errors: errors,
+            msg: "Error"
+        })
+    } else {
+        await eventToDelete.save()
+        res.json({
+            event: eventToDelete,
+            msg: "Event invitee deleted successfully", 
+        })
+    }
+})
 

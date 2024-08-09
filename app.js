@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const express = require('express');
-const cors = require('cors');
+//const cors = require('cors');
 const session = require("express-session");
 const flash = require('connect-flash')
 const passport = require("passport");
@@ -33,25 +33,40 @@ const limiter = RateLimit({
 });
 // Apply rate limiter to all requests
 
-/*
+app.use(limiter);
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
   next();
 })
-*/
 /*
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      "script-src": ["'self'", "*"],
+      "script-src": ["*"],
     },
   }),
 );
 */
-app.use(cors());
+/*
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["*"],   // Allow default source from anywhere
+    scriptSrc: ["*"],    // Allow script source from anywhere
+    styleSrc: ["*"],     // Allow style source from anywhere
+    imgSrc: ["*"],       // Allow image source from anywhere
+    connectSrc: ["*"],   // Allow connections to any source
+    fontSrc: ["*"],      // Allow font source from anywhere
+    objectSrc: ["*"],    // Allow object source from anywhere
+    mediaSrc: ["*"],     // Allow media source from anywhere
+    frameSrc: ["*"]      // Allow frame source from anywhere
+  }
+}));
+*/
+//app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -81,9 +96,20 @@ app.use((req, res, next) => {
       res.status(err.status || 500);
       res.send("error");
     });
-  
+  /*
+  removed
     app.listen(3000, () =>
       console.log(`App listening on port 3000!`),
     );
+    */
+//added:
+// Use PORT provided in environment or default to 3000
+const port = process.env.PORT || 3000;
+
+// Listen on `port` and 0.0.0.0
+app.listen(port, "0.0.0.0", function () {
+  // ...
+});
+    
   
   module.exports = app;

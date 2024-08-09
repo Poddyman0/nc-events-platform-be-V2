@@ -21,6 +21,8 @@ const EventSchema = new Schema({
     eventTicketAmount: {type: Number, required: true},
     eventPicture: {type: String, required: true},
     eventAtendees: [{type: Schema.Types.ObjectId, ref: "Profile", required: true}],
+    eventInvited: [{type: Schema.Types.ObjectId, ref: "Profile", required: true}],
+
 });
 
 EventSchema.virtual("eventID").get(function () {
